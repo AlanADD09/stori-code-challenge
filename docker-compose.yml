@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  transaction_processor:
+    container_name: transaction_processor
+    build:
+      context: ./transaction_processor
+      dockerfile: Dockerfile
+    image: transaction_processor:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./transaction_processor/config.env
+    networks:
+      - app-network
+    volumes:
+      - ./transaction_processor/data:/app/data
+    restart: on-failure
+
+  mssql_server:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql_server
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Admin_2024"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    networks:
+      - app-network
+    volumes:
+      - ./mssql-init:/docker-entrypoint-initdb.d
+    restart: on-failure
+
+  db_init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: db_init
+    depends_on:
+      - mssql_server
+    environment:
+      SA_PASSWORD: "Admin_2024"
+      SERVER: "mssql_server"
+    volumes:
+      - ./mssql-init:/scripts
+    entrypoint: >
+      /bin/bash -c "
+      /opt/mssql-tools/bin/sqlcmd -S mssql_server -U SA -P Admin_2024 -i /scripts/init.sql
+      "
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
