@@ -134,15 +134,6 @@ transaction_processor/
 
 ---
 
-## 🧰 Future Improvements (Optional)
-
-- Push logs to an observability system (like ELK Stack or Grafana Loki).
-- Expose Prometheus metrics from the microservice.
-- Allow dynamic CSV upload via `POST` (multipart/form-data).
-- Implement basic authentication to secure the `/process` endpoint.
-
----
-
 ## 📜 License
 
 Technical challenge project. Free to use for educational and evaluation purposes.
